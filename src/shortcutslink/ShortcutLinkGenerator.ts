@@ -1,16 +1,17 @@
-export class ShortcutLinkGenerator {
-	clipperId: string;
-	vaultName: string;
+import type { ObsidianClipperSettings } from 'src/settings/types';
 
-	constructor(clipperId: string, vaultName: string) {
-		(this.clipperId = clipperId), (this.vaultName = vaultName);
+export class ShortcutLinkGenerator {
+	clipper: ObsidianClipperSettings;
+
+	constructor(clipper: ObsidianClipperSettings) {
+		this.clipper = clipper;
 	}
 
 	public generateShortcutLink(): string {
 		return `obsidian://obsidian-clipper?clipperId=${encodeURIComponent(
-			this.clipperId
+			this.clipper.clipperId
 		)}&vault=${encodeURIComponent(
-			this.vaultName
+			this.clipper.vaultName
 		)}&title=<<replace title>>&highlightdata=<<replace content>>`;
 	}
 }

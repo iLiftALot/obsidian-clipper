@@ -1,44 +1,43 @@
 import {
 	App,
-	PluginSettingTab,
-	Plugin,
-	Modal,
 	Notice,
+	Plugin,
+	PluginSettingTab,
 	TFile,
 	View,
 	WorkspaceLeaf,
 } from 'obsidian';
 
-import type { Parameters } from './types';
-import {
-	type ObsidianClipperPluginSettings,
-	DEFAULT_SETTINGS,
-	type ObsidianClipperSettings,
-	ClipperType,
-	DEFAULT_CLIPPER_SETTING,
-	type OldClipperSettings,
-	DEFAULT_SETTINGS_EMPTY,
-} from './settings/types';
+import { randomUUID } from 'crypto';
+import { deepmerge } from 'deepmerge-ts';
+import type { SvelteComponent } from 'svelte';
+import { AdvancedNoteEntry } from './advancednotes/advancednoteentry';
+import { BookmarketlGenerator } from './bookmarkletlink/bookmarkletgenerator';
+import { CanvasEntry } from './canvasentry';
 import { ClippedData } from './clippeddata';
 import { DailyPeriodicNoteEntry } from './periodicnotes/dailyperiodicnoteentry';
 import { WeeklyPeriodicNoteEntry } from './periodicnotes/weeklyperiodicnoteentry';
+import AddNoteCommandComponent from './settings/AddNoteCommandComponent.svelte';
 import SettingsComponent from './settings/SettingsComponent.svelte';
 import { init } from './settings/settingsstore';
-import type { SvelteComponent } from 'svelte';
-import AddNoteCommandComponent from './settings/AddNoteCommandComponent.svelte';
-import BookmarkletModalComponent from './modals/BookmarkletModalComponent.svelte';
+import {
+	ClipperType,
+	DEFAULT_CLIPPER_SETTING,
+	DEFAULT_SETTINGS,
+	DEFAULT_SETTINGS_EMPTY,
+	type ObsidianClipperPluginSettings,
+	type ObsidianClipperSettings,
+	type OldClipperSettings,
+} from './settings/types';
 import { TopicNoteEntry } from './topicnoteentry';
-import { BookmarketlGenerator } from './bookmarkletlink/bookmarkletgenerator';
-import { AdvancedNoteEntry } from './advancednotes/advancednoteentry';
-import { CanvasEntry } from './canvasentry';
-import { Utility } from './utils/utility';
+import type { Parameters } from './types';
 import { getFileName } from './utils/fileutils';
+import { ShortcutLinkGenerator } from './shortcutslink/ShortcutLinkGenerator';
+import { Utility } from './utils/utility';
 import {
 	BookmarkletLinksView,
 	VIEW_TYPE_EXAMPLE,
 } from './views/BookmarkletLinksView';
-import { deepmerge } from 'deepmerge-ts';
-import { randomUUID } from 'crypto';
 
 export default class ObsidianClipperPlugin extends Plugin {
 	settings: ObsidianClipperPluginSettings;
@@ -98,6 +97,60 @@ export default class ObsidianClipperPlugin extends Plugin {
 								type: ClipperType.CANVAS,
 							},
 						});
+					}
+				}
+			},
+		});
+
+		this.addCommand({
+			id: 'copy-topic-bookmarklet-clipboard',
+			name: 'Copy Topic Note Bookmarklet (Clipboard)',
+			checkCallback: (checking: boolean) => {
+				if (checking) {
+					return (
+						this.app.workspace.getActiveViewOfType(View)?.file.extension ===
+						'md'
+					);
+				} else {
+					const ctx = this.app.workspace.getActiveViewOfType(View);
+					if (ctx) {
+						const filePath = ctx.file?.path;
+						Utility.assertNotNull(filePath);
+						const foundClipper = this.settings.clippers.find((clipper) => {
+							return clipper.notePath === filePath;
+						});
+						if (foundClipper) {
+							this.handleCopyBookmarkletToClipboard(foundClipper);
+						} else {
+							new Notice("Couldn't find setting for this note");
+						}
+					}
+				}
+			},
+		});
+
+		this.addCommand({
+			id: 'copy-topic-apple-shortcut-clipboard',
+			name: 'Copy Topic Note Apple Shortcut (Clipboard)',
+			checkCallback: (checking: boolean) => {
+				if (checking) {
+					return (
+						this.app.workspace.getActiveViewOfType(View)?.file.extension ===
+						'md'
+					);
+				} else {
+					const ctx = this.app.workspace.getActiveViewOfType(View);
+					if (ctx) {
+						const filePath = ctx.file?.path;
+						Utility.assertNotNull(filePath);
+						const foundClipper = this.settings.clippers.find((clipper) => {
+							return clipper.notePath === filePath;
+						});
+						if (foundClipper) {
+							this.handleCopyShortcutToClipboard(foundClipper);
+						} else {
+							new Notice("Couldn't find setting for this note");
+						}
 					}
 				}
 			},
@@ -248,43 +301,26 @@ export default class ObsidianClipperPlugin extends Plugin {
 		return mergedSettings;
 	}
 
-	handleCopyBookmarkletToClipboard(clipperId: string, notePath = '') {
-		const clipperSettings = this.settings.clippers.find(
-			(settings: ObsidianClipperSettings) => {
-				return settings.clipperId == clipperId;
-			}
-		);
-		Utility.assertNotNull(clipperSettings);
+	handleCopyBookmarkletToClipboard(clipper: ObsidianClipperSettings) {
 		navigator.clipboard.writeText(
 			new BookmarketlGenerator(
-				clipperSettings.clipperId,
+				clipper.clipperId,
 				this.app.vault.getName(),
-				notePath,
-				clipperSettings.markdownSettings,
+				clipper.notePath,
+				clipper.markdownSettings,
 				(
 					this.settings.experimentalBookmarkletComment &&
-					clipperSettings.captureComments
+					clipper.captureComments
 				).toString()
 			).generateBookmarklet()
 		);
 		new Notice('Obsidian Clipper Bookmarklet copied to clipboard.');
 	}
 
-	handleCopyBookmarkletCommand(filePath = '') {
-		const bookmarkletLinkModal = new Modal(this.app);
-		bookmarkletLinkModal.titleEl.createEl('h2', {
-			text: 'Copy Your Bookmarklet',
-		});
-
-		new BookmarkletModalComponent({
-			target: bookmarkletLinkModal.contentEl,
-			props: {
-				vaultName: this.app.vault.getName(),
-				filePath: filePath,
-			},
-		});
-
-		bookmarkletLinkModal.open();
+	handleCopyShortcutToClipboard(clipper: ObsidianClipperSettings) {
+		navigator.clipboard.writeText(
+			new ShortcutLinkGenerator(clipper).generateShortcutLink()
+		);
 	}
 
 	writeNoteEntry(
