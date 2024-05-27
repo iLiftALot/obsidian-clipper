@@ -7,13 +7,15 @@ export class TopicNoteEntry extends NoteEntry {
 	async writeToNote(
 		file: TAbstractFile | null,
 		noteEntry: ClippedData,
-		heading: string
-	) {
+		heading?: string,
+		headingLevel?: number
+	): Promise<void> {
 		Utility.assertNotNull(file);
 		this.handleWrite(
 			file.path,
 			await noteEntry.formattedEntry(this.template),
-			heading
+			heading,
+			headingLevel
 		);
 	}
 }

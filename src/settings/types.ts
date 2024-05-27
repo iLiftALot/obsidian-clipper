@@ -59,6 +59,7 @@ export interface BaseClipperSettings {
 	timestampFormat: string;
 	dateFormat: string;
 	heading: string;
+	headingLevel: number;
 	openOnWrite: boolean;
 	position: SectionPosition;
 	entryTemplateLocation: string;
@@ -87,6 +88,7 @@ export const DEFAULT_CLIPPER_SETTING: ObsidianClipperSettings = {
 	vaultName: '',
 	notePath: '',
 	heading: '',
+	headingLevel: 1,
 	tags: '',
 	timestampFormat: 'HH:mm',
 	dateFormat: 'MM/DD/YY',

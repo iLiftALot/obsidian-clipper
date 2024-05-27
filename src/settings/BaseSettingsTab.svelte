@@ -48,7 +48,8 @@
 				<span slot="name">Note Header</span>
 				<span slot="description">
 					What header should highlight data be prepended/appended under? <br
-					/>(Don't include the '#')
+					/>(Don't include the '#'.) If the header doesn't exist, it will be
+					created and appeneded to the end of the document.
 				</span>
 				<input
 					slot="control"
@@ -57,6 +58,22 @@
 					spellcheck="false"
 					placeholder=""
 				/>
+			</SettingItem>
+
+			<SettingItem>
+				<span slot="name">Header Level</span>
+				<span slot="description">What level of heading to use?</span>
+				<select
+					slot="control"
+					class="dropdown"
+					bind:value={$settings.headingLevel}
+				>
+					<option value={1}>#</option>
+					<option value={2}>##</option>
+					<option value={3}>###</option>
+					<option value={4}>####</option>
+					<option value={5}>#####</option>
+				</select>
 			</SettingItem>
 
 			<SettingItem>

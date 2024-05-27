@@ -307,7 +307,7 @@ export default class ObsidianClipperPlugin extends Plugin {
 				clipper.clipperId,
 				this.app.vault.getName(),
 				clipper.notePath,
-				clipper.markdownSettings,
+				clipper.headingLevel,
 				(
 					this.settings.experimentalBookmarkletComment &&
 					clipper.captureComments
@@ -340,7 +340,12 @@ export default class ObsidianClipperPlugin extends Plugin {
 					clipperSettings.openOnWrite,
 					clipperSettings.position,
 					clipperSettings.entryTemplateLocation
-				).writeToNote(file, noteEntry, clipperSettings.heading);
+				).writeToNote(
+					file,
+					noteEntry,
+					clipperSettings.heading,
+					clipperSettings.headingLevel
+				);
 			}
 		} else {
 			if (type === ClipperType.DAILY) {
@@ -349,7 +354,11 @@ export default class ObsidianClipperPlugin extends Plugin {
 					clipperSettings.openOnWrite,
 					clipperSettings.position,
 					clipperSettings.entryTemplateLocation
-				).writeToPeriodicNote(noteEntry, clipperSettings.heading);
+				).writeToPeriodicNote(
+					noteEntry,
+					clipperSettings.heading,
+					clipperSettings.headingLevel
+				);
 			}
 
 			if (type === ClipperType.WEEKLY) {
@@ -358,7 +367,11 @@ export default class ObsidianClipperPlugin extends Plugin {
 					clipperSettings.openOnWrite,
 					clipperSettings.position,
 					clipperSettings.entryTemplateLocation
-				).writeToPeriodicNote(noteEntry, clipperSettings.heading);
+				).writeToPeriodicNote(
+					noteEntry,
+					clipperSettings.heading,
+					clipperSettings.headingLevel
+				);
 			}
 		}
 	}

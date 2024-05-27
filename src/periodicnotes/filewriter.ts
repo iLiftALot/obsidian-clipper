@@ -4,10 +4,10 @@ import {
 	TFile,
 	TFolder,
 	base64ToArrayBuffer,
-	type HeadingCache,
 	type SectionCache,
 	WorkspaceLeaf,
 } from 'obsidian';
+import { findStartAndAppendFromHeadingInCache } from 'src/utils/fileutils';
 import { Utility } from 'src/utils/utility';
 
 export abstract class FileWriter {
@@ -33,7 +33,8 @@ export abstract class FileWriter {
 	public async write(
 		file: TFile,
 		clippedData: string,
-		heading?: string
+		heading?: string,
+		headingLevel?: number
 	): Promise<TFile> {
 		const fileData = await this.app.vault.read(file);
 		const fileLines = fileData.split('\n');
@@ -46,14 +47,31 @@ export abstract class FileWriter {
 				this.positionDataWithNoHeader(fileData, clippedData, startLine)
 			);
 		} else {
+			//TODO: We are trying to find a matching heading
+			//We will create if we don't find
+			Utility.assertNotNull(headingLevel);
+
 			let insertSection: { firstLine: number; lastLine?: number } = {
 				firstLine: 0,
 				lastLine: 0,
 			};
 			try {
-				insertSection = this.getEndAndBeginningOfHeading(file, heading);
+				insertSection = this.getEndAndBeginningOfHeading(
+					file,
+					heading,
+					headingLevel
+				);
 			} catch (e) {
-				throw Error('Missing Expected Heading');
+				//TODO: Create the header, append the clipping and append everything to the end of the file
+				//
+				clippedData = `${'#'.repeat(headingLevel)} ${heading} \n\n ${clippedData}`;
+				const startLine = this.getEndOfFrontmatter(file);
+
+				return this.writeAndOpenFile(
+					file.path,
+					this.positionDataWithNoHeader(fileData, clippedData, startLine)
+				);
+				// throw Error('Missing Expected Heading');
 			}
 
 			const preSectionContent = fileLines.slice(0, insertSection.firstLine); // This should include the header
@@ -138,7 +156,8 @@ export abstract class FileWriter {
 
 	private getEndAndBeginningOfHeading(
 		file: TFile,
-		heading: string
+		heading: string,
+		headingLevel: number
 	): { lastLine: number; firstLine: number } {
 		// Get the CachedMetadata for this file
 		const cache = this.app.metadataCache.getFileCache(file);
@@ -147,42 +166,13 @@ export abstract class FileWriter {
 		try {
 			const cachedHeadings = cache.headings;
 			Utility.assertNotNull(cachedHeadings);
-			return this.findStartAndAppendFromHeadingInCache(heading, cachedHeadings);
+			return findStartAndAppendFromHeadingInCache(
+				heading,
+				headingLevel,
+				cachedHeadings
+			);
 		} catch (e) {
 			new Notice("Can't find heading");
-			throw Error('Heading not found');
-		}
-	}
-
-	private findStartAndAppendFromHeadingInCache(
-		heading: string,
-		cachedHeadings: HeadingCache[]
-	) {
-		// We need to see if the configured heading exists in the document
-		const foundHeadingIndex = cachedHeadings.findIndex((cachedHeading) => {
-			return cachedHeading.heading === heading && cachedHeading.level === 1;
-		});
-
-		if (foundHeadingIndex !== -1) {
-			const foundHeading = cachedHeadings[foundHeadingIndex];
-			let nextHeading: HeadingCache | null = null;
-			// Need to find the next level 1 heading, if any
-			for (let i = foundHeadingIndex + 1; i < cachedHeadings?.length; i++) {
-				const cachedHeading = cachedHeadings[i];
-				if (cachedHeading.level === 1) {
-					nextHeading = cachedHeading;
-					break;
-				}
-			}
-
-			const prependLine = foundHeading.position.start.line; // line after the Heading
-			let appendLine = -1;
-			if (nextHeading) {
-				// Figure out Append location based on the nextHeading
-				appendLine = nextHeading.position.start.line; // The line before the next heading
-			}
-			return { lastLine: appendLine, firstLine: prependLine };
-		} else {
 			throw Error('Heading not found');
 		}
 	}

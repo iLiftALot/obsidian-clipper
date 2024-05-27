@@ -14,7 +14,7 @@ interface HeadingSettings {
 ((
 	clipperId: string,
 	vault: string,
-	headingSettings: HeadingSettings,
+	headerLevelBase: string,
 	captureComment: string
 ) => {
 	const vaultName = encodeURIComponent(vault);
@@ -34,37 +34,44 @@ interface HeadingSettings {
 	markdownService.addRule('heading_1_update', {
 		filter: ['h1'],
 		replacement: function (content: string) {
-			return `${headingSettings.h1} ${content}`;
+			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 1)} ${content} \n\n`;
+			// 	return `${headingSettings.h1} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_2_update', {
 		filter: ['h2'],
 		replacement: function (content: string) {
-			return `${headingSettings.h2} ${content}`;
+			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 2)} ${content} \n\n`;
+
+			// return `${headingSettings.h2} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_3_update', {
 		filter: ['h3'],
 		replacement: function (content: string) {
-			return `${headingSettings.h3} ${content}`;
+			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 3)} ${content} \n\n`;
+			// return `${headingSettings.h3} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_4_update', {
 		filter: ['h4'],
 		replacement: function (content: string) {
-			return `${headingSettings.h4} ${content}`;
+			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 4)} ${content} \n\n`;
+			// return `${headingSettings.h4} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_5_update', {
 		filter: ['h5'],
 		replacement: function (content: string) {
-			return `${headingSettings.h5} ${content}`;
+			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 4)} ${content} \n\n`;
+			// return `${headingSettings.h5} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_6_update', {
 		filter: ['h6'],
 		replacement: function (content: string) {
-			return `${headingSettings.h6} ${content}`;
+			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 4)} ${content} \n\n`;
+			// return `${headingSettings.h6} ${content}`;
 		},
 	});
 	markdownService.addRule('fix_relative_links', {
@@ -276,13 +283,6 @@ border-radius: 0.5rem !important;
 })(
 	'~ClipperIdFiller~',
 	'~VaultNameFiller~',
-	{
-		h1: '~H1Setting~',
-		h2: '~H2Setting~',
-		h3: '~H3Setting~',
-		h4: '~H4Setting~',
-		h5: '~H5Setting~',
-		h6: '~H6Setting~',
-	},
+	'~HeaderLevelBase~',
 	'~CaptureComment~'
 );

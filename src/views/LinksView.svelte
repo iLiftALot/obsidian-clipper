@@ -11,7 +11,7 @@
 				clipper.clipperId,
 				clipper.vaultName,
 				clipper.notePath,
-				clipper.markdownSettings,
+				clipper.headingLevel,
 				clipper.captureComments.toString()
 			).generateBookmarklet()
 		);
@@ -20,10 +20,7 @@
 
 	const onShortcutClick = (clipper: ObsidianClipperSettings) => {
 		navigator.clipboard.writeText(
-			new ShortcutLinkGenerator(
-				clipper.clipperId,
-				clipper.vaultName
-			).generateShortcutLink()
+			new ShortcutLinkGenerator(clipper).generateShortcutLink()
 		);
 		new Notice(`${clipper.name} Shortcut link copied to clipboard.`);
 	};
