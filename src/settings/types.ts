@@ -20,7 +20,6 @@ export type ClipperType = (typeof ClipperType)[keyof typeof ClipperType];
 export interface ObsidianClipperPluginSettings {
 	clippers: ObsidianClipperSettings[];
 	version: number;
-	experimentalBookmarkletComment: boolean;
 }
 
 export interface OldClipperSettings {
@@ -45,7 +44,6 @@ export interface OldClipperSettings {
 	advancedStorageFolder: string;
 	captureComments: boolean;
 	experimentalCanvas: boolean;
-	experimentalBookmarkletComment: boolean;
 }
 
 export interface BaseClipperSettings {
@@ -114,11 +112,9 @@ default_daily.type = ClipperType.DAILY;
 export const DEFAULT_SETTINGS: ObsidianClipperPluginSettings = {
 	clippers: [default_daily],
 	version: 2.0,
-	experimentalBookmarkletComment: false,
 };
 
 export const DEFAULT_SETTINGS_EMPTY: ObsidianClipperPluginSettings = {
 	clippers: [],
 	version: 2.0,
-	experimentalBookmarkletComment: false,
 };

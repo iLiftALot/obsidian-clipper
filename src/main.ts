@@ -308,10 +308,7 @@ export default class ObsidianClipperPlugin extends Plugin {
 				this.app.vault.getName(),
 				clipper.notePath,
 				clipper.headingLevel,
-				(
-					this.settings.experimentalBookmarkletComment &&
-					clipper.captureComments
-				).toString()
+				clipper.captureComments.toString()
 			).generateBookmarklet()
 		);
 		new Notice('Obsidian Clipper Bookmarklet copied to clipboard.');
