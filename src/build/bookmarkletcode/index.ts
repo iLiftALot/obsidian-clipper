@@ -2,15 +2,6 @@
 import TurndownService from 'turndown';
 import { MarkdownTables } from './markdown/tables';
 
-interface HeadingSettings {
-	h1: string;
-	h2: string;
-	h3: string;
-	h4: string;
-	h5: string;
-	h6: string;
-}
-
 ((
 	clipperId: string,
 	vault: string,
@@ -35,43 +26,36 @@ interface HeadingSettings {
 		filter: ['h1'],
 		replacement: function (content: string) {
 			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 1)} ${content} \n\n`;
-			// 	return `${headingSettings.h1} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_2_update', {
 		filter: ['h2'],
 		replacement: function (content: string) {
 			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 2)} ${content} \n\n`;
-
-			// return `${headingSettings.h2} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_3_update', {
 		filter: ['h3'],
 		replacement: function (content: string) {
 			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 3)} ${content} \n\n`;
-			// return `${headingSettings.h3} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_4_update', {
 		filter: ['h4'],
 		replacement: function (content: string) {
 			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 4)} ${content} \n\n`;
-			// return `${headingSettings.h4} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_5_update', {
 		filter: ['h5'],
 		replacement: function (content: string) {
 			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 4)} ${content} \n\n`;
-			// return `${headingSettings.h5} ${content}`;
 		},
 	});
 	markdownService.addRule('heading_6_update', {
 		filter: ['h6'],
 		replacement: function (content: string) {
 			return `${'#'.repeat(parseInt(headerLevelBase, 10) + 4)} ${content} \n\n`;
-			// return `${headingSettings.h6} ${content}`;
 		},
 	});
 	markdownService.addRule('fix_relative_links', {
