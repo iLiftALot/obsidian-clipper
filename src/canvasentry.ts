@@ -20,7 +20,8 @@ export class CanvasEntry {
 		const content = noteEntry.getEntryContent();
 		Utility.assertNotNull(content);
 		const fileData = await this.app.vault.read(file);
-		const canvasData: CanvasData = JSON.parse(fileData);
+		const canvasData: CanvasData =
+			fileData === '' ? JSON.parse('{}') : JSON.parse(fileData);
 
 		const newNode = this.createTextNode(
 			canvasData.nodes,
