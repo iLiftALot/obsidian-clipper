@@ -2,7 +2,7 @@ import { ItemView, WorkspaceLeaf } from 'obsidian';
 import type { SvelteComponent } from 'svelte';
 import LinksView from './LinksView.svelte';
 
-export const VIEW_TYPE_EXAMPLE = 'example-view';
+export const VIEW_TYPE = 'Clipper';
 
 export class BookmarkletLinksView extends ItemView {
 	private view: SvelteComponent;
@@ -16,11 +16,11 @@ export class BookmarkletLinksView extends ItemView {
 	}
 
 	getViewType() {
-		return VIEW_TYPE_EXAMPLE;
+		return VIEW_TYPE;
 	}
 
 	getDisplayText() {
-		return 'Example view';
+		return VIEW_TYPE;
 	}
 
 	async onOpen() {

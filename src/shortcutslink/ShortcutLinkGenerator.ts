@@ -12,6 +12,6 @@ export class ShortcutLinkGenerator {
 			this.clipper.clipperId
 		)}&vault=${encodeURIComponent(
 			this.clipper.vaultName
-		)}&title=<<replace title>>&highlightdata=<<replace content>>`;
+		)}&url=${encodeURIComponent('shortcut')}&title=<<replace title>>&highlightdata=<<replace content>>`;
 	}
 }

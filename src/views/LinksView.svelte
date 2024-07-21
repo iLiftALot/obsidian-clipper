@@ -24,6 +24,11 @@
 		);
 		new Notice(`${clipper.name} Shortcut link copied to clipboard.`);
 	};
+
+	const onClipperIdClick = (clipper: ObsidianClipperSettings) => {
+		navigator.clipboard.writeText(clipper.clipperId);
+		new Notice(`${clipper.name} Clipper Id copied to clipboard.`);
+	};
 </script>
 
 <h2>Clipper Bookmarklets</h2>
@@ -46,6 +51,15 @@
 				on:click={() => onShortcutClick(clipper)}
 			>
 				Shortcuts URL
+			</a>
+		</li>
+		<li>
+			<a
+				href="#top"
+				on:keypress={() => onClipperIdClick(clipper)}
+				on:click={() => onClipperIdClick(clipper)}
+			>
+				Copy Clipper Id
 			</a>
 		</li>
 	</div>

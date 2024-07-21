@@ -36,7 +36,7 @@ import { ShortcutLinkGenerator } from './shortcutslink/ShortcutLinkGenerator';
 import { Utility } from './utils/utility';
 import {
 	BookmarkletLinksView,
-	VIEW_TYPE_EXAMPLE,
+	VIEW_TYPE,
 } from './views/BookmarkletLinksView';
 
 export default class ObsidianClipperPlugin extends Plugin {
@@ -193,7 +193,7 @@ export default class ObsidianClipperPlugin extends Plugin {
 		});
 
 		this.registerView(
-			VIEW_TYPE_EXAMPLE,
+			VIEW_TYPE,
 			(leaf) => new BookmarkletLinksView(leaf)
 		);
 
@@ -206,7 +206,7 @@ export default class ObsidianClipperPlugin extends Plugin {
 		const { workspace } = this.app;
 
 		let leaf: WorkspaceLeaf | null = null;
-		const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE);
 
 		if (leaves.length > 0) {
 			// A leaf with our view already exists, use that
@@ -215,7 +215,7 @@ export default class ObsidianClipperPlugin extends Plugin {
 			// Our view could not be found in the workspace, create a new leaf
 			// in the right sidebar for it
 			leaf = workspace.getRightLeaf(false);
-			await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true });
+			await leaf.setViewState({ type: VIEW_TYPE, active: true });
 		}
 
 		// "Reveal" the leaf in case it is in a collapsed sidebar
