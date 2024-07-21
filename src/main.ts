@@ -156,6 +156,20 @@ export default class ObsidianClipperPlugin extends Plugin {
 			},
 		});
 
+		// Is the Clipper View Open?
+		this.addCommand({
+			id: "show-clipper-view",
+			name: "Open view",
+			checkCallback: (checking: boolean) => {
+				if (checking) {
+					return (
+						this.app.workspace.getLeavesOfType(VIEW_TYPE).length === 0
+					);
+				}
+				this.activateView();
+			},
+		});
+
 		this.registerObsidianProtocolHandler('obsidian-clipper', async (e) => {
 			const parameters = e as unknown as Parameters;
 
@@ -197,9 +211,9 @@ export default class ObsidianClipperPlugin extends Plugin {
 			(leaf) => new BookmarkletLinksView(leaf)
 		);
 
-		this.addRibbonIcon('paperclip', 'Activate view', () => {
-			this.activateView();
-		});
+		// this.addRibbonIcon('paperclip', 'Clipper', () => {
+		// 	this.activateView();
+		// });
 	}
 
 	async activateView() {
