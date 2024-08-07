@@ -45,7 +45,7 @@
 	<div class="clp_section_margin">
 		{#if $settings.type !== ClipperType.CANVAS}
 			<SettingItem>
-				<span slot="name">Note Header</span>
+				<span slot="name">Header</span>
 				<span slot="description">
 					What header should highlight data be prepended/appended under? <br
 					/>(Don't include the '#'.) If the header doesn't exist, it will be
@@ -77,7 +77,7 @@
 			</SettingItem>
 
 			<SettingItem>
-				<span slot="name">Note Position</span>
+				<span slot="name">Position</span>
 				<span slot="description"
 					>Prepend clippings to the top of the section or append them to the
 					bottom of the section?</span
@@ -90,8 +90,11 @@
 		{/if}
 
 		<SettingItem>
-			<span slot="name">Open Note After Adding Clipping?</span>
-			<span slot="description"></span>
+			<span slot="name">Focus Note After Adding Clipping?</span>
+			<span slot="description"
+				>Should this note take focus in Obsidian after adding the clipping to
+				the note?</span
+			>
 			<select
 				slot="control"
 				class="dropdown"
@@ -120,7 +123,7 @@
 	<div class="clp_section_margin">
 		<SettingItem>
 			<span slot="name">Tags</span>
-			<span slot="description">Tags to add to captured highlights?</span>
+			<span slot="description">Tags to add to captured clippings?</span>
 			<input
 				slot="control"
 				type="text"
