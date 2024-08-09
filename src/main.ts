@@ -19,7 +19,7 @@ import { DailyPeriodicNoteEntry } from './periodicnotes/dailyperiodicnoteentry';
 import { WeeklyPeriodicNoteEntry } from './periodicnotes/weeklyperiodicnoteentry';
 import AddNoteCommandComponent from './settings/AddNoteCommandComponent.svelte';
 import SettingsComponent from './settings/SettingsComponent.svelte';
-import { init } from './settings/settingsstore';
+import { init, pluginSettings } from './settings/settingsstore';
 import {
 	ClipperType,
 	DEFAULT_CLIPPER_SETTING,
@@ -34,10 +34,7 @@ import type { Parameters } from './types';
 import { getFileName } from './utils/fileutils';
 import { ShortcutLinkGenerator } from './shortcutslink/ShortcutLinkGenerator';
 import { Utility } from './utils/utility';
-import {
-	BookmarkletLinksView,
-	VIEW_TYPE,
-} from './views/BookmarkletLinksView';
+import { BookmarkletLinksView, VIEW_TYPE } from './views/BookmarkletLinksView';
 
 export default class ObsidianClipperPlugin extends Plugin {
 	settings: ObsidianClipperPluginSettings;
@@ -158,13 +155,11 @@ export default class ObsidianClipperPlugin extends Plugin {
 
 		// Is the Clipper View Open?
 		this.addCommand({
-			id: "show-clipper-view",
-			name: "Open view",
+			id: 'show-clipper-view',
+			name: 'Open view',
 			checkCallback: (checking: boolean) => {
 				if (checking) {
-					return (
-						this.app.workspace.getLeavesOfType(VIEW_TYPE).length === 0
-					);
+					return this.app.workspace.getLeavesOfType(VIEW_TYPE).length === 0;
 				}
 				this.activateView();
 			},
@@ -179,37 +174,66 @@ export default class ObsidianClipperPlugin extends Plugin {
 			const comments = parameters.comments;
 			const clipperId = parameters.clipperId;
 
-			const clipperSettings = this.settings.clippers.find(
-				(c) => c.clipperId === clipperId
-			);
-			Utility.assertNotNull(clipperSettings);
+			if (!clipperId) {
+				debugger;
+				if (parameters.notePath) {
+					// Check to see if there is a setting for this topic note
+					const found = this.settings.clippers.find((item) => {
+						return (
+							item.notePath === parameters.notePath &&
+							item.type === ClipperType.TOPIC
+						);
+					});
+					if (!found) {
+						new AddNoteCommandComponent({
+							target: createEl('div'),
+							props: {
+								app: this.app,
+								filePath: parameters.notePath,
+								type: ClipperType.TOPIC,
+							},
+						});
+					} else {
+						new Notice(
+							`There is already a Config for this ${parameters.notePath}`
+						);
+					}
+				} else {
+					// Just notify the user that they should replace the use bookmarklet with either their Daily or Weekly depending on how they were using the previous version
+					new Notice(
+						'Old Daily or Weekly Bookmarklet used. Please reinstall the bookmarklet from settings'
+					);
+				}
+			} else {
+				const clipperSettings = this.settings.clippers.find(
+					(c) => c.clipperId === clipperId
+				);
+				Utility.assertNotNull(clipperSettings);
 
-			let entryReference = highlightData;
+				let entryReference = highlightData;
 
-			if (clipperSettings.advancedStorage && highlightData) {
-				const domain = Utility.parseDomainFromUrl(url);
-				entryReference = await new AdvancedNoteEntry(
+				if (clipperSettings.advancedStorage && highlightData) {
+					const domain = Utility.parseDomainFromUrl(url);
+					entryReference = await new AdvancedNoteEntry(
+						this.app,
+						clipperSettings.advancedStorageFolder
+					).writeToAdvancedNoteStorage(domain, highlightData, url);
+				}
+
+				const noteEntry = new ClippedData(
+					title,
+					url,
+					clipperSettings,
 					this.app,
-					clipperSettings.advancedStorageFolder
-				).writeToAdvancedNoteStorage(domain, highlightData, url);
+					entryReference,
+					comments
+				);
+
+				this.writeNoteEntry(clipperSettings, noteEntry);
 			}
-
-			const noteEntry = new ClippedData(
-				title,
-				url,
-				clipperSettings,
-				this.app,
-				entryReference,
-				comments
-			);
-
-			this.writeNoteEntry(clipperSettings, noteEntry);
 		});
 
-		this.registerView(
-			VIEW_TYPE,
-			(leaf) => new BookmarkletLinksView(leaf)
-		);
+		this.registerView(VIEW_TYPE, (leaf) => new BookmarkletLinksView(leaf));
 
 		// this.addRibbonIcon('paperclip', 'Clipper', () => {
 		// 	this.activateView();
