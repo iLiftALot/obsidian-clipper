@@ -1,5 +1,6 @@
 import {
 	App,
+	Modal,
 	Notice,
 	Plugin,
 	PluginSettingTab,
@@ -19,7 +20,7 @@ import { DailyPeriodicNoteEntry } from './periodicnotes/dailyperiodicnoteentry';
 import { WeeklyPeriodicNoteEntry } from './periodicnotes/weeklyperiodicnoteentry';
 import AddNoteCommandComponent from './settings/AddNoteCommandComponent.svelte';
 import SettingsComponent from './settings/SettingsComponent.svelte';
-import { init, pluginSettings } from './settings/settingsstore';
+import { init } from './settings/settingsstore';
 import {
 	ClipperType,
 	DEFAULT_CLIPPER_SETTING,
@@ -175,16 +176,15 @@ export default class ObsidianClipperPlugin extends Plugin {
 			const clipperId = parameters.clipperId;
 
 			if (!clipperId) {
-				debugger;
 				if (parameters.notePath) {
-					// Check to see if there is a setting for this topic note
-					const found = this.settings.clippers.find((item) => {
-						return (
-							item.notePath === parameters.notePath &&
-							item.type === ClipperType.TOPIC
-						);
+					const modal = new Modal(this.app);
+					modal.titleEl.createEl('h2', {
+						text: 'Migrate Topic Note to New Settings',
 					});
-					if (!found) {
+					modal.contentEl.createEl('div', {
+						text: 'It looks like you used a bookmarklet installed by the previous version of the Clipper plugin. A new clipper has been created and you can install the new bookmarklet',
+					});
+					modal.onClose = () => {
 						new AddNoteCommandComponent({
 							target: createEl('div'),
 							props: {
@@ -193,11 +193,8 @@ export default class ObsidianClipperPlugin extends Plugin {
 								type: ClipperType.TOPIC,
 							},
 						});
-					} else {
-						new Notice(
-							`There is already a Config for this ${parameters.notePath}`
-						);
-					}
+					};
+					modal.open();
 				} else {
 					// Just notify the user that they should replace the use bookmarklet with either their Daily or Weekly depending on how they were using the previous version
 					new Notice(
