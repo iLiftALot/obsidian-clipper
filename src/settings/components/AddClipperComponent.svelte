@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createPopperActions } from 'svelte-popperjs';
 	import { ClipperType, DEFAULT_CLIPPER_SETTING } from '../types';
-	import { deepmerge } from 'deepmerge-ts';
 	import { randomUUID } from 'crypto';
 	import { pluginSettings } from '../settingsstore';
 
@@ -39,7 +38,7 @@
 	};
 
 	const addClipper = () => {
-		let clipperPlaceholderSettings = deepmerge({}, DEFAULT_CLIPPER_SETTING);
+		let clipperPlaceholderSettings = structuredClone(DEFAULT_CLIPPER_SETTING);
 		clipperPlaceholderSettings.clipperId = randomUUID();
 		clipperPlaceholderSettings.name = addClipperName;
 		clipperPlaceholderSettings.type = addClipperType;

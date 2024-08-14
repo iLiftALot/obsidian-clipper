@@ -10,7 +10,6 @@ import {
 } from 'obsidian';
 
 import { randomUUID } from 'crypto';
-import { deepmerge } from 'deepmerge-ts';
 import type { SvelteComponent } from 'svelte';
 import { AdvancedNoteEntry } from './advancednotes/advancednoteentry';
 import { BookmarketlGenerator } from './bookmarkletlink/bookmarkletgenerator';
@@ -231,10 +230,6 @@ export default class ObsidianClipperPlugin extends Plugin {
 		});
 
 		this.registerView(VIEW_TYPE, (leaf) => new BookmarkletLinksView(leaf));
-
-		// this.addRibbonIcon('paperclip', 'Clipper', () => {
-		// 	this.activateView();
-		// });
 	}
 
 	async activateView() {
@@ -283,54 +278,53 @@ export default class ObsidianClipperPlugin extends Plugin {
 	mergeExistingSetting(
 		settingsData: OldClipperSettings
 	): ObsidianClipperPluginSettings {
-		const mergedSettings = deepmerge(
-			DEFAULT_SETTINGS_EMPTY,
-			{}
+		const mergedSettings = structuredClone(
+			DEFAULT_SETTINGS_EMPTY
 		) as ObsidianClipperPluginSettings;
 		if (settingsData.useDailyNote === true) {
-			const transfered = deepmerge(
-				DEFAULT_CLIPPER_SETTING,
-				{}
+			const dailyTransfered = structuredClone(
+				DEFAULT_CLIPPER_SETTING
 			) as ObsidianClipperSettings;
-			transfered.clipperId = randomUUID();
-			transfered.type = 'daily';
-			transfered.name = settingsData.dailyNoteHeading;
-			transfered.vaultName = this.app.vault.getName();
-			transfered.heading = settingsData.dailyNoteHeading;
-			transfered.tags = settingsData.tags;
-			transfered.timestampFormat = settingsData.timestampFormat;
-			transfered.dateFormat = settingsData.dateFormat;
-			transfered.openOnWrite = settingsData.dailyOpenOnWrite;
-			transfered.position = settingsData.dailyPosition;
-			transfered.entryTemplateLocation =
+			dailyTransfered.clipperId = randomUUID();
+			dailyTransfered.type = 'daily';
+			dailyTransfered.name = settingsData.dailyNoteHeading;
+			dailyTransfered.vaultName = this.app.vault.getName();
+			dailyTransfered.heading = settingsData.dailyNoteHeading;
+			dailyTransfered.tags = settingsData.tags;
+			dailyTransfered.timestampFormat = settingsData.timestampFormat;
+			dailyTransfered.dateFormat = settingsData.dateFormat;
+			dailyTransfered.openOnWrite = settingsData.dailyOpenOnWrite;
+			dailyTransfered.position = settingsData.dailyPosition;
+			dailyTransfered.entryTemplateLocation =
 				settingsData.dailyEntryTemplateLocation;
-			transfered.markdownSettings = settingsData.markdownSettings;
-			transfered.advancedStorage = settingsData.advanced;
-			transfered.advancedStorageFolder = settingsData.advancedStorageFolder;
-			mergedSettings.clippers.push(transfered);
+			dailyTransfered.markdownSettings = settingsData.markdownSettings;
+			dailyTransfered.advancedStorage = settingsData.advanced;
+			dailyTransfered.advancedStorageFolder =
+				settingsData.advancedStorageFolder;
+			mergedSettings.clippers.push(dailyTransfered);
 		}
 
 		if (settingsData.useWeeklyNote === true) {
-			const transfered = deepmerge(
-				DEFAULT_CLIPPER_SETTING,
-				{}
+			const weeklyTransfered = structuredClone(
+				DEFAULT_CLIPPER_SETTING
 			) as ObsidianClipperSettings;
-			transfered.clipperId = randomUUID();
-			transfered.type = 'weekly';
-			transfered.name = settingsData.weeklyNoteHeading;
-			transfered.vaultName = this.app.vault.getName();
-			transfered.heading = settingsData.weeklyNoteHeading;
-			transfered.tags = settingsData.tags;
-			transfered.timestampFormat = settingsData.timestampFormat;
-			transfered.dateFormat = settingsData.dateFormat;
-			transfered.openOnWrite = settingsData.weeklyOpenOnWrite;
-			transfered.position = settingsData.weeklyPosition;
-			transfered.entryTemplateLocation =
+			weeklyTransfered.clipperId = randomUUID();
+			weeklyTransfered.type = 'weekly';
+			weeklyTransfered.name = settingsData.weeklyNoteHeading;
+			weeklyTransfered.vaultName = this.app.vault.getName();
+			weeklyTransfered.heading = settingsData.weeklyNoteHeading;
+			weeklyTransfered.tags = settingsData.tags;
+			weeklyTransfered.timestampFormat = settingsData.timestampFormat;
+			weeklyTransfered.dateFormat = settingsData.dateFormat;
+			weeklyTransfered.openOnWrite = settingsData.weeklyOpenOnWrite;
+			weeklyTransfered.position = settingsData.weeklyPosition;
+			weeklyTransfered.entryTemplateLocation =
 				settingsData.weeklyEntryTemplateLocation;
-			transfered.markdownSettings = settingsData.markdownSettings;
-			transfered.advancedStorage = settingsData.advanced;
-			transfered.advancedStorageFolder = settingsData.advancedStorageFolder;
-			mergedSettings.clippers.push(transfered);
+			weeklyTransfered.markdownSettings = settingsData.markdownSettings;
+			weeklyTransfered.advancedStorage = settingsData.advanced;
+			weeklyTransfered.advancedStorageFolder =
+				settingsData.advancedStorageFolder;
+			mergedSettings.clippers.push(weeklyTransfered);
 		}
 
 		return mergedSettings;

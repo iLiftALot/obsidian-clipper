@@ -1,5 +1,3 @@
-import { deepmerge } from 'deepmerge-ts';
-
 export const SectionPosition = {
 	PREPEND: 'prepend',
 	APPEND: 'append',
@@ -106,7 +104,7 @@ export const DEFAULT_CLIPPER_SETTING: ObsidianClipperSettings = {
 	captureComments: false,
 };
 
-const default_daily = deepmerge({}, DEFAULT_CLIPPER_SETTING);
+const default_daily = structuredClone(DEFAULT_CLIPPER_SETTING);
 default_daily.type = ClipperType.DAILY;
 
 export const DEFAULT_SETTINGS: ObsidianClipperPluginSettings = {
