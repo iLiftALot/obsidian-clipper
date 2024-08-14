@@ -1,6 +1,5 @@
 import {
 	App,
-	Modal,
 	Notice,
 	Plugin,
 	PluginSettingTab,
@@ -17,7 +16,7 @@ import { CanvasEntry } from './canvasentry';
 import { ClippedData } from './clippeddata';
 import { DailyPeriodicNoteEntry } from './periodicnotes/dailyperiodicnoteentry';
 import { WeeklyPeriodicNoteEntry } from './periodicnotes/weeklyperiodicnoteentry';
-import AddNoteCommandComponent from './settings/AddNoteCommandComponent.svelte';
+import AddNoteCommandComponent from './settings/components/addnotecommand/AddNoteCommandComponent.svelte';
 import SettingsComponent from './settings/SettingsComponent.svelte';
 import { init } from './settings/settingsstore';
 import {
@@ -35,6 +34,7 @@ import { getFileName } from './utils/fileutils';
 import { ShortcutLinkGenerator } from './shortcutslink/ShortcutLinkGenerator';
 import { Utility } from './utils/utility';
 import { BookmarkletLinksView, VIEW_TYPE } from './views/BookmarkletLinksView';
+import { MigrateTopicNoteModal } from './settings/components/migratetopicnote/migratetopicnotemodal';
 
 export default class ObsidianClipperPlugin extends Plugin {
 	settings: ObsidianClipperPluginSettings;
@@ -176,23 +176,11 @@ export default class ObsidianClipperPlugin extends Plugin {
 
 			if (!clipperId) {
 				if (parameters.notePath) {
-					const modal = new Modal(this.app);
-					modal.titleEl.createEl('h2', {
-						text: 'Migrate Topic Note to New Settings',
-					});
-					modal.contentEl.createEl('div', {
-						text: 'It looks like you used a bookmarklet installed by the previous version of the Clipper plugin. A new clipper has been created and you can install the new bookmarklet',
-					});
-					modal.onClose = () => {
-						new AddNoteCommandComponent({
-							target: createEl('div'),
-							props: {
-								app: this.app,
-								filePath: parameters.notePath,
-								type: ClipperType.TOPIC,
-							},
-						});
-					};
+					const modal = new MigrateTopicNoteModal(
+						this.app,
+						parameters.notePath
+					);
+
 					modal.open();
 				} else {
 					// Just notify the user that they should replace the use bookmarklet with either their Daily or Weekly depending on how they were using the previous version

@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { App, Modal } from 'obsidian';
 
-	import { deepmerge } from 'deepmerge-ts';
-	import { pluginSettings } from './settingsstore';
-	import { DEFAULT_CLIPPER_SETTING } from './types';
-	import ClipperSettingsComponent from './components/ClipperSettingsComponent.svelte';
+	import { pluginSettings } from '../../settingsstore';
+	import { DEFAULT_CLIPPER_SETTING } from '../../types';
+	import ClipperSettingsComponent from '../ClipperSettingsComponent.svelte';
 	import { getFileName } from 'src/utils/fileutils';
 
 	export let app: App;
 	export let filePath: string;
 	export let type: 'topic' | 'canvas';
 
-	let clipperPlaceholderSettings = deepmerge({}, DEFAULT_CLIPPER_SETTING);
+	// let clipperPlaceholderSettings = deepmerge({}, DEFAULT_CLIPPER_SETTING);
+
+	let clipperPlaceholderSettings = structuredClone(DEFAULT_CLIPPER_SETTING);
 
 	// Do we have an existing clipper for this note?
 	let settingsIndex = $pluginSettings.clippers.findIndex((c) => {
@@ -42,6 +43,7 @@
 		props: {
 			app,
 			settingsIndex,
+			activeTabNumber: 2,
 		},
 	});
 

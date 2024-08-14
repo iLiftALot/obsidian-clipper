@@ -12,6 +12,7 @@
 
 	export let app: App;
 	export let settingsIndex: number;
+	export let activeTabNumber = 1;
 
 	const settings = propertyStore(pluginSettings, ['clippers', settingsIndex]);
 
@@ -29,7 +30,7 @@
 		},
 		{
 			label: 'Browser',
-			value: 3,
+			value: 2,
 			component: LinksSettingsGroup,
 			props: {
 				settings: settings,
@@ -38,7 +39,7 @@
 		},
 		{
 			label: 'Advanced',
-			value: 4,
+			value: 3,
 			component: AdvancedSettingsGroup,
 			props: {
 				pluginSettings: pluginSettings,
@@ -97,5 +98,5 @@
 		/>
 	{/if}
 
-	<Tabs {tabs} />
+	<Tabs {tabs} activeTabValue={activeTabNumber} />
 {/if}
