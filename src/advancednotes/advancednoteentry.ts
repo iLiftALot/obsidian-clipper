@@ -39,8 +39,6 @@ export class AdvancedNoteEntry extends NoteEntry {
 		const folder = this.app.vault.getAbstractFileByPath(this.storageFolder);
 		let file = this.app.vault.getAbstractFileByPath(noteFilePath);
 
-		console.log(`FILEPATH: ${noteFilePath}`);
-
 		if (!(file instanceof TFile)) {
 			// create the file and write data
 			if (!(folder instanceof TFolder)) {

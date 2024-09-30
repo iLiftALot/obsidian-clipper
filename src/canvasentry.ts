@@ -43,7 +43,7 @@ export class CanvasEntry {
 		const nodesWithLayout: CanvasTextData[] = [];
 		layout.nodes().forEach((element) => {
 			const nodeData = layout.node(element);
-			console.log(nodeData);
+			//console.log(nodeData);
 			const label = nodeData.label;
 			Utility.assertNotNull(label);
 			nodesWithLayout.push({

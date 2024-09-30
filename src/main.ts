@@ -88,11 +88,8 @@ export default class ObsidianClipperPlugin extends Plugin {
 
 			const url = parameters.url;
 			let baseURI = parameters.baseURI ?? Utility.parseDomainFromUrl(url);
-			console.log(`UTILITY PARSED URL: ${Utility.parseDomainFromUrl(url)}`);
 			const uriHasPrefix = baseURI.match(/^[\w:/]+?\.(?=\S+?\.)/);
 			if (uriHasPrefix) baseURI = baseURI.slice(uriHasPrefix[0].length);
-			const vault = parameters.vault;
-			const format = parameters.format;
 			const title = parameters.title;
 			const highlightData = parameters.highlightdata;
 			const comments = parameters.comments;
@@ -154,12 +151,6 @@ export default class ObsidianClipperPlugin extends Plugin {
 					this.settings.weeklyEntryTemplateLocation
 				).writeToPeriodicNote(noteEntry, this.settings.weeklyNoteHeading);
 			} else if (notePath?.length > 0) {
-				// if (notePath?.length === 0) {
-				// 	notePath = `${this.settings.advancedStorageFolder}/${baseURI}.md`;
-				// }
-				console.log(
-					`Vault: ${vault}\nFormat: ${format}\nURL: ${url}\nTitle: ${title}\nNote Path: ${notePath}\nHighlight Data: ${highlightData}\nComments: ${comments}\nDescription: ${description}\nBase URI: ${baseURI}\n`
-				);
 				let file = this.app.vault.getAbstractFileByPath(notePath);
 				if (!(file instanceof TFile)) file = await this.app.vault.create(notePath, '');
 
