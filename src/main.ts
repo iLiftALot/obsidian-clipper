@@ -22,7 +22,8 @@ import { init } from './settings/settingsstore';
 import type { SvelteComponent } from 'svelte';
 import BookmarkletModalComponent from './modals/BookmarkletModalComponent.svelte';
 import { TopicNoteEntry } from './topicnoteentry';
-import { BookmarketlGenerator } from './bookmarkletlink/bookmarkletgenerator';
+// @ts-ignore
+import { BookmarketlGenerator } from './bookmarkletlink/build-bookmarkletgenerator';
 import { AdvancedNoteEntry } from './advancednotes/advancednoteentry';
 import { CanvasEntry } from './canvasentry';
 import { Utility } from './utils/utility';
