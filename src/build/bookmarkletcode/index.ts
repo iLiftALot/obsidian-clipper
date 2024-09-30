@@ -16,13 +16,11 @@ interface HeadingSettings {
 	note: string,
 	headingSettings: HeadingSettings,
 	captureComment: string,
-	descriptionData: string,
 ) => {
 	const vaultName = encodeURIComponent(vault);
 	const notePath = encodeURIComponent(note);
 	const useComment = encodeURIComponent(captureComment);
 	let comment = '';
-	let description = descriptionData;
 
 	const markdownService = new TurndownService({
 		headingStyle: 'atx',
@@ -82,7 +80,7 @@ interface HeadingSettings {
 
 	const content = markdownService.turndown(getSelectionHtml());
 
-	function getSelectionHtml(): string {
+	function getSelectionHtml (): string {
 		let html = '';
 		if (typeof window.getSelection != 'undefined') {
 			const sel = window.getSelection();
@@ -97,7 +95,7 @@ interface HeadingSettings {
 		return html;
 	}
 
-	function showContentLengthWarning(obsidianUrl: string) {
+	function showContentLengthWarning (obsidianUrl: string) {
 		if (
 			navigator.userAgent.indexOf('Chrome') !== -1 &&
 			navigator.userAgent.indexOf('Windows') !== -1
@@ -112,7 +110,7 @@ interface HeadingSettings {
 		return false;
 	}
 
-	function sendToObsidian(): void {
+	function sendToObsidian (): void {
 		const modalOverlay = document.getElementsByClassName(
 			'obsidian-clipper-modal-overlay'
 		)[0] as HTMLElement;
@@ -126,23 +124,20 @@ interface HeadingSettings {
 		}
 		const url = document.URL;
 		const title = document.title;
-		description = description !== '' ? (document.querySelector(
-			'meta[name="description"]'
-		)?.getAttribute('content') ?? '') : description;
+		//const description = document.querySelector('meta[name="description"]')
+		//			?.getAttribute('content') ?? '';
 
 		// Turn the content into Markdown
-
 		const obsidianUrl = `obsidian://obsidian-clipper?vault=${vaultName}&notePath=${notePath}&url=${encodeURIComponent(
 			url
 		)}&format=md&title=${encodeURIComponent(
 			title
 		)}&highlightdata=${encodeURIComponent(
 			content
-		)}&comments=${encodeURIComponent(
-			comment
-		)}&description=${encodeURIComponent(
-			description
-		)}`;
+		)}&comments=${encodeURIComponent(comment)}`;
+		//description=${description ? encodeURIComponent(
+		//	description
+		//) : ''}`;
 
 		// Chrome on Windows limits character length of URLs
 		if (
@@ -160,7 +155,7 @@ interface HeadingSettings {
 		}
 	}
 
-	function showCommentModal() {
+	function showCommentModal () {
 		const existingModal = document.getElementsByClassName(
 			'obsidian-clipper-modal-overlay'
 		)[0] as HTMLElement;
@@ -173,12 +168,12 @@ interface HeadingSettings {
 		const styles = document.createTextNode(
 			`
 .obsidian-clipper-modal {
-	z-index: 10000;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	display: flex;
+    z-index: 10000;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
   flex-direction: column;
   gap: 0.4rem;
   width: 450px;
@@ -216,20 +211,20 @@ font-weight: 500;
 }
 
 .obsidian-clipper-modal textarea {
-	display: block; !important; 
-	padding: 0.625rem !important; 
-	background-color: #F9FAFB !important; 
-	color: #111827 !important; 
-	font-size: 0.875rem !important; 
-	line-height: 1.25rem !important; 
- 	width: 100% !important; 
-	border-radius: 0.5rem !important; 
-	border-width: 1px !important; 
-	border-color: #D1D5DB !important; 
+    display: block; !important; 
+    padding: 0.625rem !important; 
+    background-color: #F9FAFB !important; 
+    color: #111827 !important; 
+    font-size: 0.875rem !important; 
+    line-height: 1.25rem !important; 
+     width: 100% !important; 
+    border-radius: 0.5rem !important; 
+    border-width: 1px !important; 
+    border-color: #D1D5DB !important; 
 }
 
 .obsidian-clipper-modal button {
-	padding-top: 0.625rem !important;
+    padding-top: 0.625rem !important;
 padding-bottom: 0.625rem !important;
 padding-left: 1.25rem !important;
 padding-right: 1.25rem !important;
@@ -262,10 +257,10 @@ border-radius: 0.5rem !important;
 		const modalOverlay = document.createElement('div');
 		const modal = document.createElement('div');
 		modal.innerHTML = `
-		<div>
-			<label>Obsidian Clipper</label>
-			<textarea id="obsidian-clipper-comment" rows="6"	placeholder="Add your thoughts..."></textarea>
-		</div>`;
+        <div>
+            <label>Obsidian Clipper</label>
+            <textarea id="obsidian-clipper-comment" rows="6"	placeholder="Add your thoughts..."></textarea>
+        </div>`;
 
 		const btn = document.createElement('button');
 		btn.appendChild(document.createTextNode('Submit'));
@@ -295,5 +290,4 @@ border-radius: 0.5rem !important;
 		h6: '~H6Setting~',
 	},
 	'~CaptureComment~',
-	'~Description~'
 );

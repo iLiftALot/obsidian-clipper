@@ -13,7 +13,6 @@ export class ClippedData {
 	private timeStamp: string;
 	private date: string;
 	private comment: string;
-	private description: string;
 
 	constructor(
 		private title: string,
@@ -22,22 +21,20 @@ export class ClippedData {
 		app: App,
 		data = '',
 		comment = '',
-		description = ''
 	) {
+		this.app = app;
 		this.title = title;
 		this.url = url;
 		if (data !== '') {
 			this.data = data;
 		}
 		this.comment = comment;
-		this.description = description;
 		const tagJoins: string[] = [];
 		settings.tags.split(',').forEach((t) => {
 			tagJoins.push(`#${t}`);
 		});
 		this.tags = tagJoins.join(' ');
 		this.settings = settings;
-		this.app = app;
 		this.timeStamp = window.moment().format(this.settings.timestampFormat);
 		this.date = window.moment().format(this.settings.dateFormat);
 	}
@@ -55,7 +52,6 @@ export class ClippedData {
 				this.date,
 				this.data,
 				this.comment,
-				this.description,
 				rawTemplateContents
 			);
 		} else {

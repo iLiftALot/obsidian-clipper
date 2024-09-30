@@ -10,6 +10,5 @@ export interface Parameters {
 	notePath: string;
 	format: string;
 	comments?: string;
-	description?: string;
 	highlightdata?: string;
 }

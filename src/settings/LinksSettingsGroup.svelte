@@ -7,8 +7,8 @@
 	import ExtensionSettingsGroup from './ExtensionSettingsGroup.svelte';
 
 	export let vaultName = '';
-
 	export let filePath = '';
+	//export let description = '';
 	let fileName = '';
 
 	if (filePath !== '') {
@@ -21,19 +21,14 @@
 		filePath,
 		$settings.markdownSettings,
 		($settings.experimentalBookmarkletComment &&
-			$settings.captureComments).toString(),
-		''
+		$settings.captureComments).toString()
 	).generateBookmarklet();
 
 	let updateClipperHref = () => {
 		clipperHref = new BookmarketlGenerator(
-			vaultName,
-			filePath,
+			vaultName, filePath,
 			$settings.markdownSettings,
-			(
-				$settings.experimentalBookmarkletComment && $settings.captureComments
-			).toString(),
-			''
+			( $settings.experimentalBookmarkletComment && $settings.captureComments ).toString()
 		).generateBookmarklet();
 	};
 </script>
