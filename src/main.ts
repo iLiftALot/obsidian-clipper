@@ -8,7 +8,6 @@ import {
 	View,
 } from 'obsidian';
 import { deepmerge } from 'deepmerge-ts';
-
 import type { Parameters } from './types';
 import {
 	type ObsidianClipperSettings,
@@ -38,7 +37,7 @@ export default class ObsidianClipperPlugin extends Plugin {
 		this.addCommand({
 			id: 'copy-bookmarklet-address-clipboard',
 			name: 'Vault Bookmarklet to Clipboard',
-			callback: () => this.handleCopyBookmarkletToClipboard(),
+			callback: async () => await this.handleCopyBookmarkletToClipboard(),
 		});
 
 		this.addCommand({
@@ -50,8 +49,8 @@ export default class ObsidianClipperPlugin extends Plugin {
 		this.addCommand({
 			id: 'copy-note-bookmarklet-address-clipboard',
 			name: 'Topic Bookmarklet to Clipboard',
-			editorCallback: (_editor, ctx) => {
-				this.handleCopyBookmarkletToClipboard(ctx.file?.path);
+			editorCallback: async (_editor, ctx) => {
+				await this.handleCopyBookmarkletToClipboard(ctx.file?.path);
 			},
 		});
 
@@ -90,6 +89,9 @@ export default class ObsidianClipperPlugin extends Plugin {
 			const notePath = parameters.notePath;
 			const highlightData = parameters.highlightdata;
 			const comments = parameters.comments;
+			const description = parameters.description;
+
+			console.log(`URL: ${url}\nTitle: ${title}\nNote Path: ${notePath}\nHighlight Data: ${highlightData}\nComments: ${comments}\nDescription: ${description}`);
 
 			// For a brief time the bookmarklet was sending over raw html instead of processed markdown and we need to alert the user to reinstall the bookmarklet
 			if (parameters.format === 'html') {
@@ -120,15 +122,16 @@ export default class ObsidianClipperPlugin extends Plugin {
 				this.settings,
 				this.app,
 				entryReference,
-				comments
+				comments,
+				description
 			);
 
 			if (notePath && notePath !== '') {
 				const file = this.app.vault.getAbstractFileByPath(notePath);
 				if ((file as TFile).extension === 'canvas') {
-					new CanvasEntry(this.app).writeToCanvas(file as TFile, noteEntry);
+					await new CanvasEntry(this.app).writeToCanvas(file as TFile, noteEntry);
 				} else {
-					new TopicNoteEntry(
+					await new TopicNoteEntry(
 						this.app,
 						this.settings.topicOpenOnWrite,
 						this.settings.topicPosition,
@@ -137,7 +140,7 @@ export default class ObsidianClipperPlugin extends Plugin {
 				}
 			} else {
 				if (this.settings.useDailyNote) {
-					new DailyPeriodicNoteEntry(
+					await new DailyPeriodicNoteEntry(
 						this.app,
 						this.settings.dailyOpenOnWrite,
 						this.settings.dailyPosition,
@@ -146,7 +149,7 @@ export default class ObsidianClipperPlugin extends Plugin {
 				}
 
 				if (this.settings.useWeeklyNote) {
-					new WeeklyPeriodicNoteEntry(
+					await new WeeklyPeriodicNoteEntry(
 						this.app,
 						this.settings.weeklyOpenOnWrite,
 						this.settings.weeklyPosition,
@@ -170,13 +173,11 @@ export default class ObsidianClipperPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	handleCopyBookmarkletToClipboard(notePath = '') {
-		navigator.clipboard.writeText(
+	async handleCopyBookmarkletToClipboard(notePath = '') {
+		await navigator.clipboard.writeText(
 			new BookmarketlGenerator(
-				this.app.vault.getName(),
-				notePath,
-				this.settings.markdownSettings,
-				(
+				this.app.vault.getName(), notePath,
+				this.settings.markdownSettings, (
 					this.settings.experimentalBookmarkletComment &&
 					this.settings.captureComments
 				).toString()

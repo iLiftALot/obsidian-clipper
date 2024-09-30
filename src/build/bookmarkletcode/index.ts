@@ -15,13 +15,14 @@ interface HeadingSettings {
 	vault: string,
 	note: string,
 	headingSettings: HeadingSettings,
-	captureComment: string
+	captureComment: string,
+	descriptionData: string,
 ) => {
 	const vaultName = encodeURIComponent(vault);
 	const notePath = encodeURIComponent(note);
 	const useComment = encodeURIComponent(captureComment);
-
 	let comment = '';
+	let description = descriptionData;
 
 	const markdownService = new TurndownService({
 		headingStyle: 'atx',
@@ -125,6 +126,10 @@ interface HeadingSettings {
 		}
 		const url = document.URL;
 		const title = document.title;
+		description = description !== '' ? (document.querySelector(
+			'meta[name="description"]'
+		)?.getAttribute('content') ?? '') : description;
+
 		// Turn the content into Markdown
 
 		const obsidianUrl = `obsidian://obsidian-clipper?vault=${vaultName}&notePath=${notePath}&url=${encodeURIComponent(
@@ -133,7 +138,11 @@ interface HeadingSettings {
 			title
 		)}&highlightdata=${encodeURIComponent(
 			content
-		)}&comments=${encodeURIComponent(comment)}`;
+		)}&comments=${encodeURIComponent(
+			comment
+		)}&description=${encodeURIComponent(
+			description
+		)}`;
 
 		// Chrome on Windows limits character length of URLs
 		if (
@@ -285,5 +294,6 @@ border-radius: 0.5rem !important;
 		h5: '~H5Setting~',
 		h6: '~H6Setting~',
 	},
-	'~CaptureComment~'
+	'~CaptureComment~',
+	'~Description~'
 );

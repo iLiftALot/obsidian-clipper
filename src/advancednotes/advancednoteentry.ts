@@ -21,17 +21,17 @@ export class AdvancedNoteEntry extends NoteEntry {
 		let file = this.app.vault.getAbstractFileByPath(noteFilePath);
 
 		const sectionHeader = window.moment().toISOString().replaceAll(':', '-');
-		const entry = `\n# ${sectionHeader} \n ${data}\n[^1] \n\n [^1]: ${url}  \n`;
+		const entry = `\n# ${sectionHeader}\n${data}\n[^1]\n\n[^1]: ${url}\n`;
 
 		if (!(file instanceof TFile)) {
 			// create the file and write data
 			if (!(folder instanceof TFolder)) {
-				this.app.vault.createFolder(this.storageFolder);
+				await this.app.vault.createFolder(this.storageFolder);
 				await new Promise((r) => setTimeout(r, 50));
 			}
 			file = await this.app.vault.create(noteFilePath, entry);
 		} else {
-			new AppendWriter(this.app, this.openFileOnWrite).write(file, entry);
+			await new AppendWriter(this.app, this.openFileOnWrite).write(file, entry);
 		}
 		// Wait for the new note or note data to be available then return
 		await new Promise((r) => setTimeout(r, 50));

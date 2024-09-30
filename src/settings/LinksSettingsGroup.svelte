@@ -20,9 +20,9 @@
 		vaultName,
 		filePath,
 		$settings.markdownSettings,
-		(
-			$settings.experimentalBookmarkletComment && $settings.captureComments
-		).toString()
+		($settings.experimentalBookmarkletComment &&
+			$settings.captureComments).toString(),
+		''
 	).generateBookmarklet();
 
 	let updateClipperHref = () => {
@@ -32,7 +32,8 @@
 			$settings.markdownSettings,
 			(
 				$settings.experimentalBookmarkletComment && $settings.captureComments
-			).toString()
+			).toString(),
+			''
 		).generateBookmarklet();
 	};
 </script>

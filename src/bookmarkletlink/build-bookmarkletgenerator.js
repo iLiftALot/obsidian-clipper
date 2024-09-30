@@ -77,6 +77,11 @@ try {
 		'${this.captureComments}'
 	);
 
+	bookmarkletData = bookmarkletData.replace(
+		'~Description~',
+		'${this.description}'
+	);
+
 	const bookmarketGenerator = bookmarkletGeneratorTemplate.replaceAll(
 		'~BookmarkletReplace~',
 		bookmarkletData

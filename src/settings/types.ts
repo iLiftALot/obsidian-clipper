@@ -27,6 +27,7 @@ export interface ObsidianClipperSettings {
 	advanced: boolean;
 	advancedStorageFolder: string;
 	captureComments: boolean;
+	description: string;
 	experimentalCanvas: boolean;
 	experimentalBookmarkletComment: boolean;
 }
@@ -68,6 +69,7 @@ export const DEFAULT_SETTINGS: ObsidianClipperSettings = {
 	advanced: false,
 	advancedStorageFolder: 'clippings',
 	captureComments: false,
+	description: '',
 	experimentalCanvas: false,
 	experimentalBookmarkletComment: false,
 };
