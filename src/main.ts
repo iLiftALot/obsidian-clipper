@@ -151,8 +151,6 @@ export default class ObsidianClipperPlugin extends Plugin {
 				console.log(
 					`Vault: ${vault}\nFormat: ${format}\nURL: ${url}\nTitle: ${title}\nNote Path: ${notePath}\nHighlight Data: ${highlightData}\nComments: ${comments}\nDescription: ${description}\nBase URI: ${baseURI}\n`
 				);
-				console.log('Advanced Folder: ' + this.settings.advancedStorageFolder);
-				console.log('IS ADVANCED?: ' + this.settings.advanced);
 
 				const file = this.app.vault.getAbstractFileByPath(notePath);
 				if ((file as TFile).extension === 'canvas') {

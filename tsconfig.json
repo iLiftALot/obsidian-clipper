@@ -11,8 +11,14 @@
 		"importHelpers": true,
 		"isolatedModules": true,
 		"strictNullChecks": true,
+		"paths": {
+			"obsidian-typings/implementations": [
+				"./node_modules/obsidian-typings/dist/implementations.d.ts",
+				"./node_modules/obsidian-typings/dist/implementations.cjs"
+			]
+		},
 		"lib": ["DOM", "ES2021"],
-		"types": ["svelte", "node"]
+		"types": ["svelte", "node", "obsidian-typings"]
 	},
 	"include": ["**/*.ts"]
 }

@@ -3,11 +3,11 @@ import { NoteEntry } from 'src/abstracts/noteentry';
 import { AppendWriter } from 'src/periodicnotes/appendwriter';
 import { SectionPosition } from 'src/settings/types';
 import type ObsidianClipperPlugin from 'src/main';
+import moment from 'moment';
 
 export class AdvancedNoteEntry extends NoteEntry {
 	private storageFolder: string;
 	private plugin: ObsidianClipperPlugin;
-
 	constructor(app: App, plugin: ObsidianClipperPlugin, storageFolder: string) {
 		super(app, false, SectionPosition.APPEND, '');
 		this.storageFolder = storageFolder;
@@ -21,25 +21,19 @@ export class AdvancedNoteEntry extends NoteEntry {
 		title?: string
 	) {
 		const longTitle = title;
-		const baseURI = hostName.replaceAll('.', '-');
+		// Remove the prefix from the link, e.g., 'wwww.'
+		let baseURI = hostName;
+		const uriHasPrefix = baseURI.match(/^[\w:/]+?\.(?=\S+?\.)/);
+		if (uriHasPrefix) {
+			baseURI = baseURI.slice(uriHasPrefix[0].length);
+		} //.slice(hostName.indexOf('.'));
 		const noteFilePath = `${this.storageFolder}/${baseURI}.md`;
-
-		let data = content;
-		if (!data) {
-			data = `- [ ] **${longTitle}**`;
-		}
+		const data = content ?? `- [ ] **${longTitle}**`;
 
 		const folder = this.app.vault.getAbstractFileByPath(this.storageFolder);
 		let file = this.app.vault.getAbstractFileByPath(noteFilePath);
 
 		console.log(`FILEPATH: ${noteFilePath}`);
-
-		const sectionHeader = window.moment()
-			.format(
-				`${this.plugin.settings.dateFormat} ${this.plugin.settings.timestampFormat}`
-			)
-			.replaceAll(':', '-');
-		const entry = `\n### ${sectionHeader}\n${data}\n[^1]\n\n[^1]: ${url}\n`;
 
 		if (!(file instanceof TFile)) {
 			// create the file and write data
@@ -47,21 +41,33 @@ export class AdvancedNoteEntry extends NoteEntry {
 				await this.app.vault.createFolder(this.storageFolder);
 				await new Promise((r) => setTimeout(r, 50));
 			}
-			file = await this.app.vault.create(noteFilePath, entry);
-		} else {
-			await new AppendWriter(this.app, this.openFileOnWrite).write(file, entry);
+			file = await this.app.vault.create(noteFilePath, '');
+			if (!file || !(file instanceof TFile)) {
+				const errorMessage = `Unable to create clipper storage file. Most likely ${this.storageFolder} doesn't exist and we were unable to create it.`;
+
+				console.error(errorMessage);
+				new Notice(errorMessage);
+				throw Error(errorMessage);
+			}
 		}
-		// Wait for the new note or note data to be available then return
 		await new Promise((r) => setTimeout(r, 50));
 
-		if (!file) {
-			const errorMessage = `Unable to create clipper storage file. Most likely ${this.storageFolder} doesn't exist and we were unable to create it.`;
+		const currentDate = moment().format(this.plugin.settings.dateFormat);
+		const currentTime = moment().format(this.plugin.settings.timestampFormat);
 
-			console.error(errorMessage);
-			new Notice(errorMessage);
-			throw Error(errorMessage);
-		}
+		const detectDateRegex = new RegExp(`^## ${currentDate}`, 'gm');
+		const detectTimeRegex = new RegExp(`^### ${currentTime}`, 'gm');
 
-		return `![[${this.storageFolder}/${hostName}#${sectionHeader}|clipped]]`;
+		const fileContent = await this.app.vault.read(file);
+		const hasDateHeader = fileContent.match(detectDateRegex);
+		const nextTimestamp = (fileContent.match(detectTimeRegex)?.length ?? 0) + 1;
+
+		const sectionHeader = !hasDateHeader
+			? `## ${currentDate}\n### *${currentTime}*\n`
+			: `### *${currentTime}*\n`;
+		const entry = `${sectionHeader}${data} [^${nextTimestamp}]\n\n[^${nextTimestamp}]: ${url}\n\n`;
+
+		await new AppendWriter(this.app, this.openFileOnWrite).write(file, entry);
+		return `![[${noteFilePath}#${sectionHeader}|clipped]]`;
 	}
 }

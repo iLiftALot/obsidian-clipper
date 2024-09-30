@@ -143,9 +143,6 @@ interface HeadingSettings {
 		}&description=${
 			encodeURIComponent(description)
 		}`;
-		//description=${description ? encodeURIComponent(
-		//	description
-		//) : ''}`;
 
 		// Chrome on Windows limits character length of URLs
 		if (
