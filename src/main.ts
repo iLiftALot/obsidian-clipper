@@ -87,14 +87,17 @@ export default class ObsidianClipperPlugin extends Plugin {
 			const parameters = e as unknown as Parameters;
 
 			const url = parameters.url;
-			const baseURI = parameters.baseURI ?? Utility.parseDomainFromUrl(url);
+			let baseURI = parameters.baseURI ?? Utility.parseDomainFromUrl(url);
+			console.log(`UTILITY PARSED URL: ${Utility.parseDomainFromUrl(url)}`);
+			const uriHasPrefix = baseURI.match(/^[\w:/]+?\.(?=\S+?\.)/);
+			if (uriHasPrefix) baseURI = baseURI.slice(uriHasPrefix[0].length);
 			const vault = parameters.vault;
 			const format = parameters.format;
 			const title = parameters.title;
 			const highlightData = parameters.highlightdata;
 			const comments = parameters.comments;
 			const description = parameters.description;
-			let notePath = parameters.notePath;
+			const notePath = parameters.notePath;
 
 			// For a brief time the bookmarklet was sending over raw html instead of processed markdown and we need to alert the user to reinstall the bookmarklet
 			if (parameters.format === 'html') {
@@ -116,7 +119,14 @@ export default class ObsidianClipperPlugin extends Plugin {
 					this.app,
 					this,
 					this.settings.advancedStorageFolder
-				).writeToAdvancedNoteStorage(baseURI, url, highlightData ?? description, title);
+				).writeToAdvancedNoteStorage(
+					baseURI,
+					url,
+					title,
+					highlightData,
+					comments,
+					description
+				);
 			}
 
 			const noteEntry = new ClippedData(
@@ -143,16 +153,16 @@ export default class ObsidianClipperPlugin extends Plugin {
 					this.settings.weeklyPosition,
 					this.settings.weeklyEntryTemplateLocation
 				).writeToPeriodicNote(noteEntry, this.settings.weeklyNoteHeading);
-			} else {
-				if (notePath?.length === 0) {
-					notePath = `${this.settings.advancedStorageFolder}/${baseURI}.md`;
-				}
-
+			} else if (notePath?.length > 0) {
+				// if (notePath?.length === 0) {
+				// 	notePath = `${this.settings.advancedStorageFolder}/${baseURI}.md`;
+				// }
 				console.log(
 					`Vault: ${vault}\nFormat: ${format}\nURL: ${url}\nTitle: ${title}\nNote Path: ${notePath}\nHighlight Data: ${highlightData}\nComments: ${comments}\nDescription: ${description}\nBase URI: ${baseURI}\n`
 				);
+				let file = this.app.vault.getAbstractFileByPath(notePath);
+				if (!(file instanceof TFile)) file = await this.app.vault.create(notePath, '');
 
-				const file = this.app.vault.getAbstractFileByPath(notePath);
 				if ((file as TFile).extension === 'canvas') {
 					await new CanvasEntry(this.app).writeToCanvas(file as TFile, noteEntry);
 				} else {
