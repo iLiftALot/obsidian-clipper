@@ -2,26 +2,44 @@ import { Notice, TFile, TFolder, type App } from 'obsidian';
 import { NoteEntry } from 'src/abstracts/noteentry';
 import { AppendWriter } from 'src/periodicnotes/appendwriter';
 import { SectionPosition } from 'src/settings/types';
+import type ObsidianClipperPlugin from 'src/main';
 
 export class AdvancedNoteEntry extends NoteEntry {
 	private storageFolder: string;
+	private plugin: ObsidianClipperPlugin;
 
-	constructor(app: App, storageFolder: string) {
+	constructor(app: App, plugin: ObsidianClipperPlugin, storageFolder: string) {
 		super(app, false, SectionPosition.APPEND, '');
 		this.storageFolder = storageFolder;
+		this.plugin = plugin;
 	}
 
 	async writeToAdvancedNoteStorage(
 		hostName: string,
-		data: string,
-		url: string
+		url: string,
+		content?: string,
+		title?: string
 	) {
-		const noteFilePath = `${this.storageFolder}/${hostName}.md`;
+		const longTitle = title;
+		const baseURI = hostName.replaceAll('.', '-');
+		const noteFilePath = `${this.storageFolder}/${baseURI}.md`;
+
+		let data = content;
+		if (!data) {
+			data = `- [ ] **${longTitle}**`;
+		}
+
 		const folder = this.app.vault.getAbstractFileByPath(this.storageFolder);
 		let file = this.app.vault.getAbstractFileByPath(noteFilePath);
 
-		const sectionHeader = window.moment().toISOString().replaceAll(':', '-');
-		const entry = `\n# ${sectionHeader}\n${data}\n[^1]\n\n[^1]: ${url}\n`;
+		console.log(`FILEPATH: ${noteFilePath}`);
+
+		const sectionHeader = window.moment()
+			.format(
+				`${this.plugin.settings.dateFormat} ${this.plugin.settings.timestampFormat}`
+			)
+			.replaceAll(':', '-');
+		const entry = `\n### ${sectionHeader}\n${data}\n[^1]\n\n[^1]: ${url}\n`;
 
 		if (!(file instanceof TFile)) {
 			// create the file and write data

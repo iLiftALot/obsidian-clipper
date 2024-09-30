@@ -13,6 +13,7 @@ export class ClippedData {
 	private timeStamp: string;
 	private date: string;
 	private comment: string;
+	private description: string;
 
 	constructor(
 		private title: string,
@@ -21,6 +22,7 @@ export class ClippedData {
 		app: App,
 		data = '',
 		comment = '',
+		description = ''
 	) {
 		this.app = app;
 		this.title = title;
@@ -29,6 +31,7 @@ export class ClippedData {
 			this.data = data;
 		}
 		this.comment = comment;
+		this.description = description;
 		const tagJoins: string[] = [];
 		settings.tags.split(',').forEach((t) => {
 			tagJoins.push(`#${t}`);
@@ -52,18 +55,25 @@ export class ClippedData {
 				this.date,
 				this.data,
 				this.comment,
+				this.description,
 				rawTemplateContents
 			);
 		} else {
 			if (!this.data) {
-				formattedData = `- [ ] [${this.title}](${this.url}) ${this.tags}\n\n---`;
+				formattedData = `- [ ] [${this.title}](${this.url})${
+					this.tags ? ' ' + this.tags : ''
+				}\n- ${this.description}\n\n---`;
 			} else {
 				if (this.settings.advanced) {
 					// The Advanced format has the url as a footnote of the clipped data
-					formattedData = `- [ ] ${this.title} ${this.tags}\n${this.data}\n\n---`;
+					formattedData = `- [ ] ${this.title} ${this.tags}\n${
+						this.tags ? ' ' + this.tags : ''
+					}\n\n---`;
 				} else {
 					// Else make the title a link
-					formattedData = `- [ ] [${this.title}](${this.url}) ${this.tags}\n${this.data}\n\n---`;
+					formattedData = `- [ ] [${this.title}](${this.url})${
+						this.tags ? ' ' + this.tags : ''
+					}\n${this.data}\n\n---`;
 				}
 			}
 		}

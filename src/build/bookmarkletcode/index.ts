@@ -123,18 +123,26 @@ interface HeadingSettings {
 			modalOverlay.style.display = 'none';
 		}
 		const url = document.URL;
+		const baseURI = document.baseURI;
 		const title = document.title;
-		//const description = document.querySelector('meta[name="description"]')
-		//			?.getAttribute('content') ?? '';
+		const description = document.querySelector(
+			'meta[name="description"]'
+		)?.getAttribute('content') ?? '';
 
 		// Turn the content into Markdown
-		const obsidianUrl = `obsidian://obsidian-clipper?vault=${vaultName}&notePath=${notePath}&url=${encodeURIComponent(
-			url
-		)}&format=md&title=${encodeURIComponent(
-			title
-		)}&highlightdata=${encodeURIComponent(
-			content
-		)}&comments=${encodeURIComponent(comment)}`;
+		const obsidianUrl = `obsidian://obsidian-clipper?vault=${vaultName}&notePath=${notePath}&url=${
+			encodeURIComponent(url)
+		}&format=md&title=${
+			encodeURIComponent(title)
+		}&highlightdata=${
+			encodeURIComponent(content)
+		}&comments=${
+			encodeURIComponent(comment)
+		}&baseUri=${
+			encodeURIComponent(baseURI)
+		}&description=${
+			encodeURIComponent(description)
+		}`;
 		//description=${description ? encodeURIComponent(
 		//	description
 		//) : ''}`;
