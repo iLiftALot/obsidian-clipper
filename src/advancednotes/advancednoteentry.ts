@@ -31,10 +31,11 @@ export class AdvancedNoteEntry extends NoteEntry {
 		if (uriHasPrefix) baseURI = baseURI.slice(uriHasPrefix[0].length);
 		const noteFilePath = `${this.storageFolder}/${baseURI}.md`;
 
-		const commentData = comments && comments.length > 0 ? `\n**Notes**\n${comments}` : '';
-		const contentData = content && content.length > 0 ? `\n**Highlights**\n${content}` : '';
-		const descriptionData = description && description.length > 0 ? `\n- ${description}` : '';
-		const titleData = `\n- [ ] **${descriptiveTitle}**`;
+		const commentData = comments && comments.length > 0 ? `#### Notes\n${comments}` : '';
+		const contentData = content && content.length > 0 ? `#### Highlights\n${content}` : ``;
+		const descriptionData = description && description.length > 0 ? `#### Description\n${description}` : ``;
+		const titleData = `- [ ] [${descriptiveTitle}](${url})`;
+		const sep = `\n\n---\n\n`;
 
 		const folder = this.app.vault.getAbstractFileByPath(this.storageFolder);
 		let file = this.app.vault.getAbstractFileByPath(noteFilePath);
@@ -45,7 +46,7 @@ export class AdvancedNoteEntry extends NoteEntry {
 				await this.app.vault.createFolder(this.storageFolder);
 				await new Promise((r) => setTimeout(r, 50));
 			}
-			file = await this.app.vault.create(noteFilePath, `# ${baseURI}\n`);
+			file = await this.app.vault.create(noteFilePath, `# ${baseURI}`);
 			if (!file || !(file instanceof TFile)) {
 				const errorMessage = `Unable to create clipper storage file. Most likely ${this.storageFolder} doesn't exist and we were unable to create it.`;
 				console.error(errorMessage);
@@ -64,13 +65,14 @@ export class AdvancedNoteEntry extends NoteEntry {
 			hasOldHeader = moment(hasDateHeader[0], this.plugin.settings.dateFormat)
 				.isBefore(moment(currentDate, this.plugin.settings.dateFormat));
 		}
-		const nextTimestamp = (fileContent.match(/^###\s/gm)?.length ?? 0) + 1;
-		const data = `${descriptionData}${commentData}${contentData}`;
+		const nextFootnoteIndex = (fileContent.match(/^###\s/gm)?.length ?? 0) + 1;
+		const data = `${descriptionData}\n${commentData}\n${contentData}`;
 		const sectionHeader = !hasDateHeader || hasOldHeader
-			? `## ${currentDate}\n### *${currentTime}*`
-			: `### *${currentTime}*`;
-		const entry = `${sectionHeader}\n${titleData} [^${nextTimestamp}]${data}\n\n[^${nextTimestamp}]: ${url}\n\n`;
+			? `## ${currentDate}${sep}### **${currentTime}**`
+			: `${sep}### **${currentTime}**`;
+		const entry = `${sectionHeader}\n${titleData} [^${nextFootnoteIndex}]\n${data}\n\n[^${nextFootnoteIndex}]: ${url}`;
 		await new AppendWriter(this.app, this.openFileOnWrite).write(file, entry);
-		return `![[${noteFilePath}#${currentTime}|${baseURI}-${nextTimestamp}]]`;
+
+		return `![[${noteFilePath}#${currentTime}|${baseURI}-${nextFootnoteIndex}]]`;
 	}
 }
