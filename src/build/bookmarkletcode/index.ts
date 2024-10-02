@@ -16,12 +16,8 @@ interface HeadingSettings {
 	note: string,
 	headingSettings: HeadingSettings,
 	captureComment: string,
+	description: string
 ) => {
-	const vaultName = encodeURIComponent(vault);
-	const notePath = encodeURIComponent(note);
-	const useComment = encodeURIComponent(captureComment);
-	let comment = '';
-
 	const markdownService = new TurndownService({
 		headingStyle: 'atx',
 		hr: '---',
@@ -29,6 +25,13 @@ interface HeadingSettings {
 		codeBlockStyle: 'fenced',
 		emDelimiter: '*',
 	});
+
+	let content = markdownService.turndown(getSelectionHtml());
+	const vaultName = encodeURIComponent(vault);
+	const notePath = encodeURIComponent(note);
+	const useComment = encodeURIComponent(captureComment);
+	let comment = '';
+
 	const tables = new MarkdownTables();
 	markdownService.use(tables.tables);
 	markdownService.addRule('heading_1_update', {
@@ -78,8 +81,6 @@ interface HeadingSettings {
 		},
 	});
 
-	const content = markdownService.turndown(getSelectionHtml());
-
 	function getSelectionHtml (): string {
 		let html = '';
 		if (typeof window.getSelection != 'undefined') {
@@ -110,7 +111,7 @@ interface HeadingSettings {
 		return false;
 	}
 
-	function sendToObsidian (): void {
+	function sendToObsidian (highlightedContent: string): void {
 		const modalOverlay = document.getElementsByClassName(
 			'obsidian-clipper-modal-overlay'
 		)[0] as HTMLElement;
@@ -130,19 +131,15 @@ interface HeadingSettings {
 		)?.getAttribute('content') ?? '';
 
 		// Turn the content into Markdown
-		const obsidianUrl = `obsidian://obsidian-clipper?vault=${vaultName}&notePath=${notePath}&url=${
-			encodeURIComponent(url)
-		}&format=md&title=${
-			encodeURIComponent(title)
-		}&highlightdata=${
-			encodeURIComponent(content)
-		}&comments=${
-			encodeURIComponent(comment)
-		}&baseUri=${
-			encodeURIComponent(baseURI)
-		}&description=${
-			encodeURIComponent(description)
-		}`;
+		const obsidianUrl = `obsidian://obsidian-clipper?vault=${vaultName}&notePath=${notePath}&url=${encodeURIComponent(
+			url
+		)}&format=md&title=${encodeURIComponent(
+			title
+		)}&highlightdata=${encodeURIComponent(
+			highlightedContent
+		)}&comments=${encodeURIComponent(comment)}&baseUri=${encodeURIComponent(
+			baseURI
+		)}&description=${encodeURIComponent(description)}`;
 
 		// Chrome on Windows limits character length of URLs
 		if (
@@ -160,7 +157,7 @@ interface HeadingSettings {
 		}
 	}
 
-	function showCommentModal () {
+	function showCommentModal (highlightedContent: string): void {
 		const existingModal = document.getElementsByClassName(
 			'obsidian-clipper-modal-overlay'
 		)[0] as HTMLElement;
@@ -269,7 +266,11 @@ border-radius: 0.5rem !important;
 
 		const btn = document.createElement('button');
 		btn.appendChild(document.createTextNode('Submit'));
-		btn.addEventListener('click', sendToObsidian, false);
+		btn.addEventListener(
+			'click',
+			() => sendToObsidian(highlightedContent),
+			false
+		);
 		modal.appendChild(btn);
 		modal.classList.add('obsidian-clipper-modal');
 		modalOverlay.classList.add('obsidian-clipper-modal-overlay');
@@ -279,9 +280,9 @@ border-radius: 0.5rem !important;
 	}
 
 	if (useComment === 'true') {
-		showCommentModal();
+		showCommentModal(content);
 	} else {
-		sendToObsidian();
+		sendToObsidian(content);
 	}
 })(
 	'~VaultNameFiller~',
@@ -295,4 +296,5 @@ border-radius: 0.5rem !important;
 		h6: '~H6Setting~',
 	},
 	'~CaptureComment~',
+	'~Description~'
 );

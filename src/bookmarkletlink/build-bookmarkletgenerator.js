@@ -1,11 +1,18 @@
 //@ts-ignore
 /* eslint @typescript-eslint/no-var-requires: "off" */
 const fs = require('fs');
-const bookmarkletFilePath =
-	'./src/build/bookmarkletcode/dist/obsidian-clipper.min.js';
+const path = require('path');
+
+//const bookmarkletFilePath =
+//	'./src/build/bookmarkletcode/dist/obsidian-clipper.min.js';
+const bookmarkletFilePath = path.resolve(__dirname, '../build/bookmarkletcode/dist/obsidian-clipper.min.js');
+console.log(fs.readdirSync('.'));
+console.log(fs.readdirSync('./src/build/bookmarkletcode/dist/obsidian-clipper.min.js'));
+console.log(path.resolve(__dirname, '../build/bookmarkletcode/dist/obsidian-clipper.min.js'));
+console.log(path.resolve(__dirname, './src/build/bookmarkletcode/dist/obsidian-clipper.min.js'))
+
 //'../build/bookmarkletcode/dist/obsidian-clipper.min.js';
-const bookmarkletGeneratorFilePath =
-	'./src/bookmarkletlink/bookmarkletgenerator.ts';
+const bookmarkletGeneratorFilePath = './src/bookmarkletlink/bookmarkletgenerator.ts';
 const bookmarkletGeneratorTemplate = `
 /**
 * DO NOT EDIT THIS IS GENERATED CODE!
@@ -20,12 +27,14 @@ export class BookmarketlGenerator {
   notePath: string;
   markdownSettings: ObsidianClipperMarkdownSettings; 
 	captureComments: string;  
-constructor(vaultName: string, notePath = '', markdownSettings: ObsidianClipperMarkdownSettings, captureComments: string ) {
+	description: string;
+constructor(notePath = '', markdownSettings: ObsidianClipperMarkdownSettings, captureComments: string, description: string = '') {
     this.vaultName = vaultName;
     this.notePath = notePath;
     this.markdownSettings = markdownSettings;
 		this.captureComments = captureComments;
   }
+  this.description = description;
   public generateBookmarklet(): string {
     return \`~BookmarkletReplace~\`;
   }
