@@ -14,62 +14,39 @@ interface HeadingSettings {
 ((
 	vault: string,
 	note: string,
-	headingSettings: HeadingSettings,
 	captureComment: string,
-	description: string
+	headingSettings: HeadingSettings
 ) => {
 	const markdownService = new TurndownService({
 		headingStyle: 'atx',
 		hr: '---',
 		bulletListMarker: '-',
 		codeBlockStyle: 'fenced',
+		fence: '```',
 		emDelimiter: '*',
 	});
-
-	let content = markdownService.turndown(getSelectionHtml());
 	const vaultName = encodeURIComponent(vault);
 	const notePath = encodeURIComponent(note);
 	const useComment = encodeURIComponent(captureComment);
+	const selectionContent = markdownService.turndown(getSelectionHtml());
+
 	let comment = '';
 
 	const tables = new MarkdownTables();
 	markdownService.use(tables.tables);
-	markdownService.addRule('heading_1_update', {
-		filter: ['h1'],
-		replacement: function (content: string) {
-			return `${headingSettings.h1} ${content}`;
-		},
+
+	Object.entries(headingSettings).forEach(([heading, prefix]) => {
+		const level = heading.slice(1); // Extract the number from 'h1', 'h2', etc.
+		const filter = [`h${level}`] as (keyof HTMLElementTagNameMap)[];
+
+		markdownService.addRule(`heading_${level}_update`, {
+			filter: filter,
+			replacement: function (content: string) {
+				return `${prefix} ${content}`;
+			},
+		});
 	});
-	markdownService.addRule('heading_2_update', {
-		filter: ['h2'],
-		replacement: function (content: string) {
-			return `${headingSettings.h2} ${content}`;
-		},
-	});
-	markdownService.addRule('heading_3_update', {
-		filter: ['h3'],
-		replacement: function (content: string) {
-			return `${headingSettings.h3} ${content}`;
-		},
-	});
-	markdownService.addRule('heading_4_update', {
-		filter: ['h4'],
-		replacement: function (content: string) {
-			return `${headingSettings.h4} ${content}`;
-		},
-	});
-	markdownService.addRule('heading_5_update', {
-		filter: ['h5'],
-		replacement: function (content: string) {
-			return `${headingSettings.h5} ${content}`;
-		},
-	});
-	markdownService.addRule('heading_6_update', {
-		filter: ['h6'],
-		replacement: function (content: string) {
-			return `${headingSettings.h6} ${content}`;
-		},
-	});
+
 	markdownService.addRule('fix_relative_links', {
 		filter: ['a'],
 		replacement: function (content: string, node: HTMLAnchorElement) {
@@ -111,7 +88,7 @@ interface HeadingSettings {
 		return false;
 	}
 
-	function sendToObsidian (highlightedContent: string): void {
+	function sendToObsidian (highlightedContent = ''): void {
 		const modalOverlay = document.getElementsByClassName(
 			'obsidian-clipper-modal-overlay'
 		)[0] as HTMLElement;
@@ -126,9 +103,12 @@ interface HeadingSettings {
 		const url = document.URL;
 		const baseURI = document.baseURI;
 		const title = document.title;
-		const description = document.querySelector(
-			'meta[name="description"]'
-		)?.getAttribute('content') ?? '';
+		// Attempt to extract description from tag which contains page description on many websites
+		// Worked for me almost every time, but not 100%
+		const description =
+			document
+				.querySelector('meta[name="description"]')
+				?.getAttribute('content') ?? '';
 
 		// Turn the content into Markdown
 		const obsidianUrl = `obsidian://obsidian-clipper?vault=${vaultName}&notePath=${notePath}&url=${encodeURIComponent(
@@ -140,7 +120,6 @@ interface HeadingSettings {
 		)}&comments=${encodeURIComponent(comment)}&baseUri=${encodeURIComponent(
 			baseURI
 		)}&description=${encodeURIComponent(description)}`;
-
 		// Chrome on Windows limits character length of URLs
 		if (
 			navigator.userAgent.indexOf('Chrome') !== -1 &&
@@ -148,7 +127,9 @@ interface HeadingSettings {
 		) {
 			if (obsidianUrl.length >= 2000) {
 				alert(
-					`Chrome on Windows doesn't allow a highlight this large. ${obsidianUrl.length} characters have been selected and it must be less than 2000`
+					`Chrome on Windows doesn't allow a highlight this large. \
+					${obsidianUrl.length} characters have been selected and it \
+					must be less than 2000`
 				);
 			}
 		}
@@ -166,7 +147,7 @@ interface HeadingSettings {
 			return;
 		}
 
-		const s = document.createElement('style');
+		const styleContainer = document.createElement('style');
 		const styles = document.createTextNode(
 			`
 .obsidian-clipper-modal {
@@ -252,9 +233,9 @@ border-radius: 0.5rem !important;
 
 `
 		);
-		s.appendChild(styles);
+		styleContainer.appendChild(styles);
 		const docHead = document.getElementsByTagName('head');
-		docHead[0].appendChild(s);
+		docHead[0].appendChild(styleContainer);
 
 		const modalOverlay = document.createElement('div');
 		const modal = document.createElement('div');
@@ -280,21 +261,15 @@ border-radius: 0.5rem !important;
 	}
 
 	if (useComment === 'true') {
-		showCommentModal(content);
+		showCommentModal(selectionContent);
 	} else {
-		sendToObsidian(content);
+		sendToObsidian();
 	}
-})(
-	'~VaultNameFiller~',
-	'~NotePath~',
-	{
-		h1: '~H1Setting~',
-		h2: '~H2Setting~',
-		h3: '~H3Setting~',
-		h4: '~H4Setting~',
-		h5: '~H5Setting~',
-		h6: '~H6Setting~',
-	},
-	'~CaptureComment~',
-	'~Description~'
-);
+})('~VaultNameFiller~', '~NotePath~', '~CaptureComment~', {
+	h1: '~H1Setting~',
+	h2: '~H2Setting~',
+	h3: '~H3Setting~',
+	h4: '~H4Setting~',
+	h5: '~H5Setting~',
+	h6: '~H6Setting~',
+});
