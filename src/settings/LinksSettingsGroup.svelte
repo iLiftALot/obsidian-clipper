@@ -8,9 +8,7 @@
 
 	export let vaultName = '';
 	export let filePath = '';
-	//export let description = '';
 	let fileName = '';
-
 	if (filePath !== '') {
 		fileName = getFileName(filePath);
 	}
@@ -19,16 +17,15 @@
 	let clipperHref = new BookmarketlGenerator(
 		vaultName,
 		filePath,
+		($settings.experimentalBookmarkletComment && $settings.captureComments).toString(),
 		$settings.markdownSettings,
-		($settings.experimentalBookmarkletComment &&
-		$settings.captureComments).toString()
 	).generateBookmarklet();
 
 	let updateClipperHref = () => {
 		clipperHref = new BookmarketlGenerator(
 			vaultName, filePath,
+			($settings.experimentalBookmarkletComment && $settings.captureComments).toString(),
 			$settings.markdownSettings,
-			( $settings.experimentalBookmarkletComment && $settings.captureComments ).toString()
 		).generateBookmarklet();
 	};
 </script>
