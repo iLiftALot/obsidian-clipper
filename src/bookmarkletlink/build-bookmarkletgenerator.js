@@ -1,18 +1,12 @@
 //@ts-ignore
 /* eslint @typescript-eslint/no-var-requires: "off" */
 const fs = require('fs');
-const path = require('path');
 
-//const bookmarkletFilePath =
-//	'./src/build/bookmarkletcode/dist/obsidian-clipper.min.js';
-const bookmarkletFilePath = path.resolve(__dirname, '../build/bookmarkletcode/dist/obsidian-clipper.min.js');
-console.log(fs.readdirSync('.'));
-console.log(fs.readdirSync('./src/build/bookmarkletcode/dist/obsidian-clipper.min.js'));
-console.log(path.resolve(__dirname, '../build/bookmarkletcode/dist/obsidian-clipper.min.js'));
-console.log(path.resolve(__dirname, './src/build/bookmarkletcode/dist/obsidian-clipper.min.js'))
+const bookmarkletFilePath =
+	'./src/build/bookmarkletcode/dist/obsidian-clipper.min.js';
+const bookmarkletGeneratorFilePath =
+	'./src/bookmarkletlink/bookmarkletgenerator.ts';
 
-//'../build/bookmarkletcode/dist/obsidian-clipper.min.js';
-const bookmarkletGeneratorFilePath = './src/bookmarkletlink/bookmarkletgenerator.ts';
 const bookmarkletGeneratorTemplate = `
 /**
 * DO NOT EDIT THIS IS GENERATED CODE!
@@ -26,15 +20,14 @@ export class BookmarketlGenerator {
   vaultName: string;
   notePath: string;
   markdownSettings: ObsidianClipperMarkdownSettings; 
-	captureComments: string;  
-	description: string;
-constructor(notePath = '', markdownSettings: ObsidianClipperMarkdownSettings, captureComments: string, description: string = '') {
+  captureComments: string;
+  constructor(vaultName: string, notePath: string = '', captureComments: string, markdownSettings: ObsidianClipperMarkdownSettings) {
     this.vaultName = vaultName;
     this.notePath = notePath;
     this.markdownSettings = markdownSettings;
-		this.captureComments = captureComments;
+	  this.captureComments = captureComments;
   }
-  this.description = description;
+
   public generateBookmarklet(): string {
     return \`~BookmarkletReplace~\`;
   }
@@ -49,7 +42,10 @@ try {
 		'${this.vaultName}'
 	);
 
-	bookmarkletData = bookmarkletData.replace('~NotePath~', '${this.notePath}');
+	bookmarkletData = bookmarkletData.replace(
+		'~NotePath~',
+		'${this.notePath}'
+	);
 
 	bookmarkletData = bookmarkletData.replace(
 		'~H1Setting~',
@@ -84,11 +80,6 @@ try {
 	bookmarkletData = bookmarkletData.replace(
 		'~CaptureComment~',
 		'${this.captureComments}'
-	);
-
-	bookmarkletData = bookmarkletData.replace(
-		'~Description~',
-		'${this.description}'
 	);
 
 	const bookmarketGenerator = bookmarkletGeneratorTemplate.replaceAll(
