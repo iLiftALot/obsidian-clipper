@@ -26,3 +26,4 @@ assets/shared
 context/
 .vscode/notes.md
 .vscode/settings.json
+dprint.jsonc
