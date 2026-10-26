@@ -27,3 +27,4 @@ context/
 .vscode/notes.md
 .vscode/settings.json
 dprint.jsonc
+DEV_README.md
